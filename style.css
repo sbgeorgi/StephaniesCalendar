@@ -254,7 +254,7 @@ hr { border: none; border-top: 1px solid var(--border-light); margin: 1.5rem 0; 
 
 /* --- Analytics Page Styles --- */
 body.analytics-page { background-color: var(--bg-page); }
-.analytics-container { width: 100%; max-width: 1600px; margin: 0 auto; padding: 20px; background-color: var(--bg-card); }
+.analytics-container { width: 100%; max-width: 1600px; margin: 0 auto; padding: 20px; box-sizing: border-box; }
 .analytics-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-subtle); }
 .analytics-header h1 { font-size: 2rem; font-weight: 600; color: var(--text-primary); }
 .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 24px; }
@@ -267,4 +267,153 @@ body.analytics-page { background-color: var(--bg-page); }
 .chart-card-header h3 { font-size: 1.15rem; font-weight: 600; color: var(--text-primary); margin: 0; }
 .chart-card-header input[type="date"] { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-light); background-color: var(--bg-input); font-family: 'Poppins', sans-serif; color: var(--text-primary); }
 .chart-body { position: relative; flex: 1; min-height: 0; }
-@media (max-width: 1200px) { .chart-grid { grid-template-columns: 1fr; } }
+
+
+/* =================================================================== */
+/* ==                 MOBILE & RESPONSIVE STYLES                    == */
+/* =================================================================== */
+
+/* --- Tablet & Medium Screens (e.g., iPads in portrait) --- */
+@media (max-width: 992px) {
+    /* Stack analytics charts into a single column */
+    .chart-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- Mobile Screens (e.g., iPhones, Android phones) --- */
+@media (max-width: 768px) {
+    body {
+        padding: 0.5rem; /* Reduce padding on small screens */
+        min-height: -webkit-fill-available; /* Correct viewport height on iOS */
+    }
+
+    /* --- Shared Containers & Forms --- */
+    .form-container, .calendar-container, .analytics-container {
+        padding: 1.5rem; /* Less padding on mobile */
+        border-radius: 12px;
+    }
+
+    .styled-form h2 {
+        font-size: 1.5rem; /* Smaller headings on mobile */
+        margin-bottom: 1.5rem;
+    }
+
+    /* --- Calendar Page --- */
+    .calendar-container {
+        height: calc(100vh - 1rem); /* Adjust height for smaller body padding */
+        padding: 1rem;
+    }
+
+    .calendar-container header {
+        flex-direction: column; /* Stack header sections */
+        align-items: flex-start; /* Align all to the left */
+        gap: 1rem;
+    }
+
+    /* --- Login Page --- */
+    #login-form .login-action-group {
+        flex-direction: column; /* Stack login button and register link */
+        align-items: stretch; /* Make button full-width */
+        gap: 1rem;
+    }
+    #login-form .redirect-message {
+        text-align: center;
+        margin-top: 0.5rem;
+    }
+
+    /* --- Modals --- */
+    dialog {
+        width: calc(100vw - 2rem); /* Ensure modal fits screen width */
+    }
+    dialog .styled-form {
+        padding: 1.5rem;
+    }
+    .modal-actions {
+        flex-direction: column-reverse; /* Stack buttons, primary on top */
+        align-items: stretch;
+    }
+    .modal-actions > * {
+        width: 100%;
+        margin: 0;
+    }
+
+    /* --- Availability Modal --- */
+    .availability-form-top {
+        grid-template-columns: 1fr; /* Stack client and service inputs */
+    }
+    .availability-header h3 {
+        font-size: 1.1rem;
+    }
+    /* Make the 7-day week grid scrollable horizontally */
+    #time-slot-grid-container {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 10px 5px;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid var(--border-subtle);
+        border-radius: 8px;
+    }
+    .day-column {
+        display: inline-flex;
+        flex-direction: column;
+        width: 90px; /* Give each day a fixed, touch-friendly width */
+        margin-right: 5px;
+    }
+    .day-column:last-child {
+        margin-right: 0;
+    }
+    .time-slot {
+        white-space: normal; /* Allow text to wrap inside the slot */
+    }
+
+    /* --- Analytics Page --- */
+    .analytics-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .analytics-header h1 {
+        font-size: 1.75rem;
+    }
+    .kpi-card .value {
+        font-size: 2rem;
+    }
+    .chart-card {
+        padding: 1.5rem;
+    }
+    .chart-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    .chart-card-header input[type="date"] {
+        width: 100%;
+    }
+}
+
+/* --- Small Mobile Screens --- */
+@media (max-width: 480px) {
+    .form-container, .calendar-container, .analytics-container, dialog .styled-form {
+        padding: 1rem; /* Even less padding */
+    }
+    .styled-form h2 {
+        font-size: 1.35rem;
+    }
+    .kpi-card .value {
+        font-size: 1.75rem;
+    }
+    
+    /* Improve FullCalendar toolbar on very narrow screens */
+    .fc .fc-toolbar.fc-header-toolbar {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+    .fc .fc-toolbar-chunk {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+}
