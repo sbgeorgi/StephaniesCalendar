@@ -23,6 +23,7 @@ if (loginForm) {
     });
 }
 
+
 const registerForm = document.getElementById('register-form');
 if (registerForm) {
     registerForm.addEventListener('submit', async (e) => {
@@ -34,17 +35,17 @@ if (registerForm) {
             return showMessage("Passwords do not match.");
         }
 
-        // --- MODIFICATION HERE ---
-        // We've added the `emailRedirectTo` option
+        // --- THIS BLOCK HAS BEEN UPDATED ---
         const { error } = await supabase.auth.signUp({ 
             email, 
             password, 
             options: { 
                 data: { full_name: fullName },
-                emailRedirectTo: 'https://<your-github-username>.github.io/<your-repository-name>/index.html'
+                // This line tells Supabase where to send the user after email confirmation.
+                emailRedirectTo: 'https://sbgeorgi.github.io/StephaniesCalendar/index.html'
             } 
         });
-        // --- END OF MODIFICATION ---
+        // --- END OF UPDATE ---
 
         if (error) {
             showMessage(error.message); 
