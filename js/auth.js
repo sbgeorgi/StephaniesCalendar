@@ -33,8 +33,22 @@ if (registerForm) {
         if (password !== document.getElementById('register-password-confirm').value) {
             return showMessage("Passwords do not match.");
         }
-        const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: fullName } } });
-        if (error) showMessage(error.message); else {
+
+        // --- MODIFICATION HERE ---
+        // We've added the `emailRedirectTo` option
+        const { error } = await supabase.auth.signUp({ 
+            email, 
+            password, 
+            options: { 
+                data: { full_name: fullName },
+                emailRedirectTo: 'https://<your-github-username>.github.io/<your-repository-name>/index.html'
+            } 
+        });
+        // --- END OF MODIFICATION ---
+
+        if (error) {
+            showMessage(error.message); 
+        } else {
             showMessage("Registration successful! Please check your email to confirm your account, then log in.", "success");
             registerForm.querySelector('button').disabled = true;
         }
