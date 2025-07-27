@@ -340,16 +340,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'timeGridWeek',
         headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' },
-        editable: true, selectable: true,
-        customButtons: {
-            today: {
-                text: 'Today',
-                click: () => { calendar.today(); calendar.changeView('timeGridDay'); }
-            }
+        editable: true, 
+        selectable: true,
+
+        // =========================================================
+        // ==         MOBILE-FRIENDLY & ROBUSTNESS FIX            ==
+        // =========================================================
+        // By using BOTH dateClick and select, we ensure the calendar is
+        // responsive to any user action on any device.
+        
+        // This handler is for a simple "tap" or "click" on a single time.
+        // It's the most reliable way to capture quick taps on mobile.
+        dateClick: function(info) {
+            const today = new Date(); 
+            today.setHours(0, 0, 0, 0);
+            if (info.date < today) { return; } // Prevent creating in past
+
+            // Create a default 1-hour appointment from the click time
+            const endTime = new Date(info.date.getTime() + 60 * 60 * 1000);
+
+            openAppointmentModal({ start: info.date, end: endTime });
         },
+
+        // This handler is for when a user "drags" to select a time range.
+        // It will still work on desktop and for press-and-drag on mobile.
         select: (info) => {
-            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const today = new Date(); 
+            today.setHours(0, 0, 0, 0);
             if (info.start < today) { calendar.unselect(); return false; }
+
             const modalData = { start: info.start, end: info.end };
             if (info.allDay) {
                 modalData.start.setHours(9, 0, 0, 0);
@@ -358,8 +377,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             openAppointmentModal(modalData);
         },
+        // =========================================================
+        // ==                  END OF FIX                         ==
+        // =========================================================
+
         eventClick: (info) => openAppointmentModal(info.event),
-        eventDrop: handleEventUpdate, eventResize: handleEventUpdate,
+        eventDrop: handleEventUpdate, 
+        eventResize: handleEventUpdate,
         slotMinTime: '08:00:00',
         slotMaxTime: '18:00:00',
         businessHours: { daysOfWeek: [1, 2, 3, 4, 5, 6], startTime: '09:00', endTime: '18:00' },
@@ -389,6 +413,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     calendar.render();
 
+    // The rest of your file is unchanged...
     const channel = supabase.channel('public:appointments').on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, () => {
         setTimeout(() => calendar.refetchEvents(), 100);
     }).subscribe();
