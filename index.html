@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Back</title>
+    <!-- Google Fonts for a modern, clean look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="form-container">
+        <form id="login-form" class="styled-form">
+            <h2>Welcome Back</h2>
+            <p id="auth-message" class="message"></p>
+            
+            <div class="input-group">
+                <label for="login-email">Email</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope icon"></i>
+                    <input type="email" id="login-email" required placeholder="Enter your email">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="login-password">Password</label>
+                <!-- No wrapper or icon inside this input -->
+                <input type="password" id="login-password" required placeholder="Enter your password">
+            </div>
+
+            <!-- New separate button for password visibility -->
+            <button type="button" id="toggle-password-login" class="password-toggle-btn">
+                <i class="fas fa-eye-slash"></i>
+            </button>
+
+            <div class="login-action-group">
+                <button type="submit" class="btn-login-simple">Login</button>
+                <p class="redirect-message">Don't have an account? <a href="register.html">Register here</a></p>
+            </div>
+        </form>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/auth.js"></script>
+
+    <!-- New inline script for the password toggle -->
+    <script>
+        const togglePasswordBtn = document.getElementById('toggle-password-login');
+        const passwordInput = document.getElementById('login-password');
+        const toggleIcon = togglePasswordBtn.querySelector('i');
+
+        togglePasswordBtn.addEventListener('click', () => {
+            const isPassword = passwordInput.getAttribute('type') === 'password';
+            if (isPassword) {
+                passwordInput.setAttribute('type', 'text');
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            } else {
+                passwordInput.setAttribute('type', 'password');
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            }
+        });
+    </script>
+</body>
+</html>

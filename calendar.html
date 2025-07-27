@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ics@3.0.1/dist/ics.min.js"></script>
+    <!-- REMOVED INLINE STYLE BLOCK - All styles are now in style.css -->
+</head>
+<body>
+    <div class="calendar-container">
+        <header>
+            <div class="header-left">
+                <a href="analytics.html" id="analytics-link">📊 Analytics</a>
+                <div id="user-info">Loading...</div>
+            </div>
+            <!-- MODIFIED: Flattened structure for inline layout -->
+            <div class="header-right">
+                <button id="request-availability-btn" class="btn-submit">Request Availability</button>
+                <button id="logout-button" class="btn-login-simple">Logout</button>
+                <button id="theme-toggle" class="theme-toggle" title="Toggle dark mode">
+                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 010 1.06l-1.591 1.59a.75.75 0 11-1.06-1.06l1.59-1.59a.75.75 0 011.06 0zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5h2.25a.75.75 0 01.75.75zM17.894 17.894a.75.75 0 011.06 0l1.59 1.591a.75.75 0 11-1.06 1.06l-1.59-1.59a.75.75 0 010-1.06zM12 18a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM5.106 17.894a.75.75 0 010-1.06l1.59-1.591a.75.75 0 111.06 1.06l-1.59 1.59a.75.75 0 01-1.06 0zM3 12a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h2.25A.75.75 0 013 12zM6.106 5.106a.75.75 0 011.06 0l1.591 1.59a.75.75 0 01-1.06 1.06l-1.59-1.59a.75.75 0 010-1.06z"></path></svg>
+                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.502-4.703-10.502-10.502 0-3.918 2.165-7.323 5.28-9.042a.75.75 0 01.818.162z" clip-rule="evenodd"></path></svg>
+                </button>
+            </div>
+        </header>
+        <div id="calendar"></div>
+    </div>
+    </div>
+    
+    <!-- (The rest of your dialogs/modals for appointment, stats, and availability remain here) -->
+    
+    <dialog id="appointment-modal">
+        <form id="appointment-form" class="styled-form">
+            <h2 id="modal-title">Appointment Details</h2>
+            <input type="hidden" id="appointment-id">
+            <input type="hidden" id="client-id">
+            <div class="input-group"><label for="service-type">Service / Event Type</label><select id="service-type" required><option value="Haircut">Haircut</option><option value="Coloring">Coloring</option><option value="Styling">Styling</option><option value="Blocked">Blocked Time</option></select></div>
+            <div id="client-details-group">
+                <div class="input-group">
+                    <label for="client-name-search">Client Name</label>
+                    <div class="client-search-wrapper">
+                        <input type="text" id="client-name-search" placeholder="Search or add new client..." autocomplete="off">
+                        <button type="button" id="client-info-btn" title="View Client History" style="display: none;">i</button>
+                        <div id="client-search-results" class="client-search-results"></div>
+                    </div>
+                </div>
+                <div class="input-group"><label for="client-email">Client Email</label><input type="email" id="client-email" placeholder="Auto-filled from selection"></div>
+            </div>
+            <div class="input-group"><label for="start-time">Start Time</label><input type="datetime-local" id="start-time" required></div>
+            <div class="input-group"><label for="end-time">End Time</label><input type="datetime-local" id="end-time" required></div>
+            <div class="input-group"><label for="notes">Notes</label><textarea id="notes" rows="3"></textarea></div>
+            <div id="modal-actions" class="modal-actions"></div>
+        </form>
+    </dialog>
+    <dialog id="client-stats-modal">
+        <div class="stats-modal-content">
+            <h2 id="stats-client-name">Client Statistics</h2>
+            <hr>
+            <p><strong>Completed Appointments:</strong> <span id="stats-completed">...</span></p>
+            <p><strong>Scheduled Appointments:</strong> <span id="stats-scheduled">...</span></p>
+            <p><strong>Last Visit:</strong> <span id="stats-last-visit">...</span></p>
+            <hr>
+            <h3>All Notes</h3>
+            <ul id="stats-all-notes"><li>Loading...</li></ul>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn-login-simple" onclick="document.getElementById('client-stats-modal').close()">Close</button>
+        </div>
+    </dialog>
+    <dialog id="availability-modal" class="availability-modal-wide">
+        <form id="availability-form" class="styled-form">
+            <h2>Request Client Availability</h2>
+            <div class="availability-form-top">
+                <div class="input-group">
+                    <label for="availability-client-search">Client</label>
+                    <div class="client-search-wrapper">
+                         <input type="text" id="availability-client-search" placeholder="Search for a client..." autocomplete="off" required>
+                         <div id="availability-search-results" class="client-search-results"></div>
+                    </div>
+                </div>
+                <div class="input-group"><label for="availability-service">Service Type</label><select id="availability-service" required><option value="Haircut">Haircut</option><option value="Coloring">Coloring</option><option value="Styling">Styling</option></select></div>
+            </div>
+            <input type="hidden" id="availability-client-email" required>
+            <hr>
+            <div class="availability-picker-container">
+                <div class="availability-header">
+                    <button type="button" id="prev-week" class="week-nav-btn">< Prev</button>
+                    <h3 id="week-display">This Week</h3>
+                    <button type="button" id="next-week" class="week-nav-btn">Next ></button>
+                </div>
+                <div id="time-slot-grid-container"></div>
+            </div>
+            <div class="modal-actions"><button type="submit" class="btn-submit">Send Request</button><button type="button" class="btn-login-simple" onclick="document.getElementById('availability-modal').close()">Cancel</button></div>
+        </form>
+    </dialog>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
