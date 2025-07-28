@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmation</title>
+    
+    <!-- Google Fonts for consistent styling -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- All styling is embedded in the page -->
+    <style>
+        body {
+            font-family: 'Poppins', -apple-system, sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+        .container {
+            text-align: center;
+            max-width: 450px;
+            background-color: #ffffff;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        }
+        .icon-container {
+            margin-bottom: 1.5rem;
+        }
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #111827;
+            margin: 0 0 0.5rem 0;
+        }
+        p {
+            font-size: 1rem;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+        .success { stroke: #16a34a; } /* Green color for success icon */
+        .error { stroke: #dc2626; }   /* Red color for error icon */
+    </style>
+</head>
+<body>
+
+    <!-- This is the main content container. Its content will be filled by JavaScript. -->
+    <div class="container">
+        <div class="icon-container" id="icon-container">
+            <!-- Icon will be inserted here -->
+        </div>
+        <h2 id="status-title">Loading...</h2>
+        <p id="details-text">Please wait while we confirm the details.</p>
+    </div>
+
+    <!-- The JavaScript logic is embedded at the end of the body -->
+    <script>
+        // Wait until the entire HTML document is loaded before running the script.
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Step 1: Read the data from the URL query parameters.
+            // e.g., ...confirmation.html?status=success&message=...
+            const params = new URLSearchParams(window.location.search);
+            const status = params.get('status');
+            const message = params.get('message');
+            const details = params.get('details');
+
+            // Step 2: Get references to the HTML elements we want to update.
+            const iconContainer = document.getElementById('icon-container');
+            const titleEl = document.getElementById('status-title');
+            const detailsEl = document.getElementById('details-text');
+
+            // Step 3: Define the SVG icons as variables for easy use.
+            const successIcon = `<svg class="success" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+            const errorIcon = `<svg class="error" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+
+            // Step 4: Check if the URL contains the expected data and update the page content.
+            if (status === 'success' && message && details) {
+                // Case 1: The page was loaded from a successful redirect.
+                document.title = 'Appointment Confirmed!'; // Update the browser tab title
+                iconContainer.innerHTML = successIcon;
+                titleEl.textContent = message;
+                detailsEl.textContent = details;
+            } else {
+                // Case 2 (Fallback): The page was opened directly or something went wrong.
+                document.title = 'Invalid Confirmation'; // Update the browser tab title
+                iconContainer.innerHTML = errorIcon;
+                titleEl.textContent = 'Invalid Confirmation';
+                detailsEl.textContent = 'Could not find appointment details. Please use the link provided in your email.';
+            }
+        });
+    </script>
+
+</body>
+</html>

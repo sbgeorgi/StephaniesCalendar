@@ -79,6 +79,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let isNewClientForThisAppointment = false;
     document.getElementById('user-info').textContent = `Welcome, Manager`;
+    
+    // --- NEW: MODAL CLOSE ON BACKDROP CLICK ---
+    // Helper function to close a modal when its backdrop (the dialog element itself) is clicked.
+    const closeModalOnClickOutside = (modal) => {
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.close();
+            }
+        });
+    };
+    
+    closeModalOnClickOutside(appointmentModal);
+    closeModalOnClickOutside(availabilityModal);
+    closeModalOnClickOutside(clientStatsModal);
+    // --- END OF MODAL CLOSE LOGIC ---
 
     function formatDateWithOrdinal(dateString) {
         const date = new Date(dateString);
@@ -203,13 +218,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // --- MODIFIED: CLIENT NAME INPUT FIX ---
+    // This function is updated to allow spaces in the client name input field.
     function setupClientSearch(searchInput, resultsContainer, onSelectCallback) {
         let searchTimeout;
         searchInput.addEventListener('input', () => {
             clearTimeout(searchTimeout);
             clientInfoBtn.style.display = 'none';
-            const searchTerm = searchInput.value.trim();
-            if (onSelectCallback) onSelectCallback({ id: '', name: searchTerm, email: '' });
+            const rawValue = searchInput.value;
+            
+            // FIX: Instead of calling a heavy-handed callback that overwrites the input,
+            // we explicitly clear the hidden client ID. This prevents the input value
+            // from being reset on every keystroke, thus allowing spaces.
+            if (searchInput === clientSearchInput) {
+                clientIdInput.value = '';
+            }
+            isNewClientForThisAppointment = true; // Assume new client until one is selected from the list
+
+            const searchTerm = rawValue.trim();
             if (searchTerm.length < 1) {
                 resultsContainer.innerHTML = '';
                 resultsContainer.style.display = 'none';
@@ -217,9 +243,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             searchTimeout = setTimeout(() => handleClientSearch(searchTerm, resultsContainer), 250);
         });
+
         resultsContainer.addEventListener('click', async (e) => {
             const target = e.target.closest('.search-result');
             if (!target) return;
+
             if (target.classList.contains('add-new')) {
                 const newName = target.dataset.name;
                 const newEmail = prompt(`Enter email for new client "${newName}": (optional)`);
@@ -233,13 +261,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 clientInfoBtn.style.display = 'flex';
                 if (onSelectCallback) onSelectCallback({ id: target.dataset.id, name: target.dataset.name, email: target.dataset.email });
             }
-            searchInput.value = target.dataset.name;
+            // The onSelectCallback now handles updating the input field value.
+            // We no longer set it directly here.
             resultsContainer.innerHTML = '';
             resultsContainer.style.display = 'none';
         });
     }
 
     async function handleClientSearch(searchTerm, resultsContainer) {
+        // Note: searchTerm is already trimmed before being passed here.
         const { data: clients, error } = await supabase.from('clients').select('id, name, email').ilike('name', `%${searchTerm}%`).limit(5);
         if (error) return;
         resultsContainer.innerHTML = '';
@@ -259,6 +289,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         resultsContainer.appendChild(addNewEl);
         resultsContainer.style.display = 'block';
     }
+    // --- END OF CLIENT NAME INPUT FIX ---
 
     setupClientSearch(clientSearchInput, clientSearchResults, (client) => {
         clientIdInput.value = client.id;
